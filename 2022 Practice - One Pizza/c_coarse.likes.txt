@@ -1,0 +1,17 @@
+occurences:
+2: 3
+3: 3
+4: 1
+5: 1
+6: 1
+
+ingredient popularity
+qzfyo: 2
+xveqd: 2
+xdozp: 2
+akuof: 3
+byyii: 3
+tfeej: 3
+vxglq: 4
+luncl: 5
+dlust: 6

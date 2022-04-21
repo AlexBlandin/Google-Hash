@@ -1,0 +1,11 @@
+occurences:
+1: 4
+2: 2
+
+ingredient popularity
+byyii: 1
+sunhp: 1
+xveqd: 1
+akuof: 1
+xdozp: 2
+qzfyo: 2
