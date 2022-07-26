@@ -6,7 +6,6 @@ authors = ["AlexBlandin"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-# rtoml = "^0.7.1"
 numpy = "^1.22.3"
 tqdm = "^4.64.0"
 
