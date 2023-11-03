@@ -1,6 +1,5 @@
-![Logo for Google Hash Code, an octothorpe in the Google colours next to the title Hash Code](./hashcode-logo.png)
+![Google Hash Code](./hashcode-logo.png)
 
-# Google-Hash
 > Repo of hash browns past (rest in problems, hash code)
 
 ```toml
