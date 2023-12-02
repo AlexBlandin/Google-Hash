@@ -2,10 +2,10 @@ from operator import itemgetter
 
 for path in ["a_example", "b_lovely_landscapes", "c_memorable_moments", "d_pet_pictures", "e_shiny_selfies"]:
   image_count = 0
-  images = [] # [image: {"id": N, "horizontal": Bool, "tags" = [String]}]
-  slideshow = [] # [slide: [image: N]]
-  tags = {} # {"tag": [image: N]}
-  
+  images = []  # [image: {"id": N, "horizontal": Bool, "tags" = [String]}]
+  slideshow = []  # [slide: [image: N]]
+  tags = {}  # {"tag": [image: N]}
+
   with open(f"{path}.txt") as o:
     lines = o.readlines()
     image_count = int(lines[0])
@@ -16,25 +16,25 @@ for path in ["a_example", "b_lovely_landscapes", "c_memorable_moments", "d_pet_p
       for tag in images[-1]["tags"]:
         tags[tag] = [] if tag not in tags else tags[tag]
         tags[tag].append(image_index)
-  
+
   for tag in tags:
-    tags[tag].sort(key = lambda image: len(images[image]["tags"]), reverse = True)
-    tags[tag].sort(key = lambda image: images[image]["tags"])
-  
+    tags[tag].sort(key=lambda image: len(images[image]["tags"]), reverse=True)
+    tags[tag].sort(key=lambda image: images[image]["tags"])
+
   for tag in [t for t in tags][:5]:
     print(f"{tag}: " + str(tags[tag] if len(tags[tag]) < 5 else (f"{tags[tag][:5]}"[:-1] + ", ... "))[1:-1])
-  
+
   if path in ["c_memorable_moments", "d_pet_pictures"]:
     temp = {}
     for tag, i in zip(tags, range(len(tags))):
       temp[tag] = i
     tags = temp
     for image in images:
-      image["tags"].sort(key = lambda tag: tags[tag])
-  
+      image["tags"].sort(key=lambda tag: tags[tag])
+
   if path != "e_shiny_selfies":
-    images.sort(key = itemgetter("tags"))
-  
+    images.sort(key=itemgetter("tags"))
+
   wait = {}
   for image in images:
     slide = []
@@ -51,8 +51,8 @@ for path in ["a_example", "b_lovely_landscapes", "c_memorable_moments", "d_pet_p
         wait = image
   if "id" in wait:
     slideshow.append([wait["id"]])
-  
-  with open(f"{path}.out", mode = "w") as o:
+
+  with open(f"{path}.out", mode="w") as o:
     # output
     o.write(f"{len(slideshow)}\n")
     for slide in slideshow:

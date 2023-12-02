@@ -3,10 +3,10 @@ from operator import itemgetter
 files = ["me_at_the_zoo"]
 
 for f, path in enumerate(files):
-  videos = [] # [{size: N, endpoints: [{endpoint_id: N, request_count: N}]}]
-  endpoints = [] # [{latency_to_server: N, connected_caches: [{cache_id: N, latency_to_cache: N}]}]
-  caches = [] # [[video_id: N]]
-  
+  videos = []  # [{size: N, endpoints: [{endpoint_id: N, request_count: N}]}]
+  endpoints = []  # [{latency_to_server: N, connected_caches: [{cache_id: N, latency_to_cache: N}]}]
+  caches = []  # [[video_id: N]]
+
   video_count, endpoint_count, request_count, cache_count, cache_size = 0, 0, 0, 0, 0
   with open(f"{path}.in") as f:
     next_endpoint = 2
@@ -14,34 +14,32 @@ for f, path in enumerate(files):
     for _line in f:
       line = [int(i) for i in _line.split() if i.isdigit()]
       line_no += 1
-      
+
       # meta data
       if line_no == 0:
         video_count, endpoint_count, request_count, cache_count, cache_size = line
         caches = [{}] * cache_count
         endpoint_ids, cache_ids, video_ids = range(endpoint_count), range(cache_count), range(video_count)
-        print(
-          f"{video_count} videos, {endpoint_count} endpoints, {request_count} requests, {cache_count} {cache_size} MB caches"
-        )
-      
+        print(f"{video_count} videos, {endpoint_count} endpoints, {request_count} requests, {cache_count} {cache_size} MB caches")
+
       # init videos
       elif line_no == 1:
         for size, video_id in zip(line, range(len(line))):
           if size <= cache_size:
             videos.append({"size": size, "endpoints": [], "cache_candidates": set()})
-      
+
       # init endpoints
       elif line_no == next_endpoint and len(line) == 2:
         latency_to_server, expected_caches = line
         next_endpoint = line_no + expected_caches + 1
         endpoints.append({"latency_to_server": latency_to_server, "connected_caches": []})
-      
+
       # connect caches to endpoints
       elif len(line) == 2:
         cache_id, latency_to_cache = line
         if latency_to_cache < endpoints[-1]["latency_to_server"]:
           endpoints[-1]["connected_caches"].append({"cache_id": cache_id, "latency_to_cache": latency_to_cache})
-      
+
       # video request
       else:
         video_id, endpoint_id, request_count = line
@@ -56,32 +54,30 @@ for f, path in enumerate(files):
               "sum_latency_to_cache": latency_to_cache,
               "size": videos[video_id]["size"],
               "score": 0,
-              "cache_candidates": set()
+              "cache_candidates": set(),
             }
           else:
             video = cache[video_id]
             video["request_count"] += request_count
             video["sum_latency_to_server"] += endpoints[endpoint_id]["latency_to_server"]
             video["sum_latency_to_cache"] += latency_to_cache
-            video["score"] = video["request_count"] * (video["sum_latency_to_server"] -
-                                                       video["sum_latency_to_cache"]) / video["size"]
+            video["score"] = video["request_count"] * (video["sum_latency_to_server"] - video["sum_latency_to_cache"]) / video["size"]
             video["cache_candidates"].add(cache_id)
-  
+
   for _cache in endpoints[endpoint_id]["connected_caches"]:
     cache = caches[_cache["cache_id"]]
     for video in cache:
       video = cache[video_id]
-      video["score"] = video["request_count"] * (video["sum_latency_to_server"] -
-                                                 video["sum_latency_to_cache"]) / video["size"]
-  
+      video["score"] = video["request_count"] * (video["sum_latency_to_server"] - video["sum_latency_to_cache"]) / video["size"]
+
   temp_caches = []
   for cache in caches:
-    temp_caches.append(sorted(cache.values(), key = itemgetter("score"), reverse = True))
-  
+    temp_caches.append(sorted(cache.values(), key=itemgetter("score"), reverse=True))
+
   caches = temp_caches
-  
+
   # output submission file
-  with open(f"{path}.out", mode = "w") as o:
+  with open(f"{path}.out", mode="w") as o:
     o.write(f"{len(caches)}\n")
     for videos, chache_id in zip(caches, range(len(caches))):
       o.write(f"{cache_id}")
