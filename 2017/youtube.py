@@ -132,9 +132,9 @@ for cache, cache_id in zip(caches, cache_ids, strict=False):
       )  # request = (video_id, sum_video_requests, sum_latency_to_caches, sum_latency_to_server, requesting_endpoints_count)
     old = requested_videos[video_id]  # current values for video
     latency_to_server = endpoints[endpoint_id][0]  # grab that endpoint's latency to the main server
-    requested_videos[video_id] = (video_id, old[0] + request_count, old[1] + latency_to_cache, old[2] + latency_to_server, old[3] + 1)  # update entry for video
+    requested_videos[video_id] = (video_id, old[0] + request_count, old[1] + latency_to_cache, old[2] + latency_to_server, old[3] + 1)  # type: ignore # update entry for video
 
-  cache = (cache[0], requested_videos, cache[2], cache[3])  # update requested_videos dictionary in cache
+  cache = (cache[0], requested_videos, cache[2], cache[3])  # update requested_videos dictionary in cache  # noqa: PLW2901
   for request in requested_videos:  # iterates over keys
     video_id, sum_video_requests, sum_latency_to_caches, sum_latency_to_server, requesting_endpoints_count = requested_videos[request]
     priority_score = request_count * (
@@ -223,7 +223,7 @@ for endpoint in endpoints:
     for cache in connected_videos[video]:
       cache_id, latency_to_cache, request_count = cache
 
-      if latency_to_cache < lowest_latency:
+      if latency_to_cache < lowest_latency:  # type: ignore
         lowest = latency_to_cache
         fastest_cache = cache_id
 

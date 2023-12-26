@@ -104,17 +104,17 @@ if __name__ == "__main__":
     with Pool() as p:
       p.starmap(main, zip([path] * 8, [lines] * 8, strict=False))
   except KeyboardInterrupt:
-    print(f"Stopped by user, top score is {top_score}")
+    print(f"Stopped by user, top score is {top_score}")  # type: ignore # noqa: F821
   """
   File format
   The submission file must contain F lines, one for each vehicle in the fleet.
   Each line describing the rides of a vehicle must contain the following integers separated by single spaces:
-  ● M – number of rides assigned to the vehicle (0 ≤ M ≤ N)
-  ● R 0 , R 1 , ..., R M-1 – ride numbers assigned to the vehicle, in the order in which the vehicle will perform
+  ● M - number of rides assigned to the vehicle (0 ≤ M ≤ N)
+  ● R 0 , R 1 , ..., R M-1 - ride numbers assigned to the vehicle, in the order in which the vehicle will perform
   them (0 ≤ Ri < N)
   Any ride can be assigned to a vehicle at most once . That is, it is not allowed to assign the same ride to
   two or more different vehicles. It is also not allowed to assign the same ride to one vehicle more than once.
-  It is not required to assign all rides to vehicles – some rides can be skipped.
+  It is not required to assign all rides to vehicles - some rides can be skipped.
   Example
   1 0      this vehicle is assigned 1 ride: [0]
   2 2 1    this vehicle is assigned 2 rides: [2, 1]
@@ -142,9 +142,9 @@ if __name__ == "__main__":
     for line in map(str.strip, lines):
       cnt, *rides = line.split()  # handles "0" case anyway
 
-  if top_score > recorded_score:
+  if top_score > recorded_score:  # type: ignore  # noqa: F821
     with open("d_metropolis.out", "w", encoding="utf8") as o:
-      for car in top_fleet:
+      for car in top_fleet:  # type: ignore  # noqa: F821
         assigned = list(map(str, car[car >= 0]))
         if len(assigned):
           o.write(f"{len(assigned)} ")

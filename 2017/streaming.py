@@ -62,10 +62,10 @@ for path in files:
             video["score"] = video["request_count"] * (video["sum_latency_to_server"] - video["sum_latency_to_cache"]) / video["size"]
             video["cache_candidates"].add(cache_id)
 
-  for _cache in endpoints[endpoint_id]["connected_caches"]:
+  for _cache in endpoints[endpoint_id]["connected_caches"]:  # type: ignore
     cache = caches[_cache["cache_id"]]
     for video in cache:
-      video = cache[video_id]
+      video = cache[video_id]  # type: ignore # noqa: PLW2901
       video["score"] = video["request_count"] * (video["sum_latency_to_server"] - video["sum_latency_to_cache"]) / video["size"]
 
   temp_caches = [sorted(cache.values(), key=itemgetter("score"), reverse=True) for cache in caches]
@@ -75,8 +75,8 @@ for path in files:
   # output submission file
   with open(f"{path}.out", mode="w", encoding="utf8") as o:
     o.write(f"{len(caches)}\n")
-    for videos, chache_id in zip(caches, range(len(caches)), strict=False):
-      o.write(f"{cache_id}")
+    for videos, chache_id in zip(caches, range(len(caches)), strict=False):  # noqa: B007
+      o.write(f"{cache_id}")  # type: ignore
       for video in videos:
         o.write(f" {video['video_id']}")
       o.write("\n")
