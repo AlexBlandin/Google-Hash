@@ -2,13 +2,13 @@ from operator import itemgetter
 
 files = ["me_at_the_zoo"]
 
-for f, path in enumerate(files):
+for path in files:
   videos = []  # [{size: N, endpoints: [{endpoint_id: N, request_count: N}]}]
   endpoints = []  # [{latency_to_server: N, connected_caches: [{cache_id: N, latency_to_cache: N}]}]
   caches = []  # [[video_id: N]]
 
   video_count, endpoint_count, request_count, cache_count, cache_size = 0, 0, 0, 0, 0
-  with open(f"{path}.in") as f:
+  with open(f"{path}.in", encoding="utf8") as f:
     next_endpoint = 2
     line_no = -1
     for _line in f:
@@ -24,9 +24,7 @@ for f, path in enumerate(files):
 
       # init videos
       elif line_no == 1:
-        for size, video_id in zip(line, range(len(line))):
-          if size <= cache_size:
-            videos.append({"size": size, "endpoints": [], "cache_candidates": set()})
+        videos.extend({"size": size, "endpoints": [], "cache_candidates": set()} for size in line if size <= cache_size)
 
       # init endpoints
       elif line_no == next_endpoint and len(line) == 2:
@@ -70,16 +68,14 @@ for f, path in enumerate(files):
       video = cache[video_id]
       video["score"] = video["request_count"] * (video["sum_latency_to_server"] - video["sum_latency_to_cache"]) / video["size"]
 
-  temp_caches = []
-  for cache in caches:
-    temp_caches.append(sorted(cache.values(), key=itemgetter("score"), reverse=True))
+  temp_caches = [sorted(cache.values(), key=itemgetter("score"), reverse=True) for cache in caches]
 
   caches = temp_caches
 
   # output submission file
-  with open(f"{path}.out", mode="w") as o:
+  with open(f"{path}.out", mode="w", encoding="utf8") as o:
     o.write(f"{len(caches)}\n")
-    for videos, chache_id in zip(caches, range(len(caches))):
+    for videos, chache_id in zip(caches, range(len(caches)), strict=False):
       o.write(f"{cache_id}")
       for video in videos:
         o.write(f" {video['video_id']}")

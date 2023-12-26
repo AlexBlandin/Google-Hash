@@ -1,5 +1,6 @@
 from functools import partial
 from math import sqrt
+
 from tqdm import tqdm
 
 """
@@ -22,7 +23,7 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
   print()
   print(f"{path}")
   source, ext = path.split(sep=".")
-  with open(path) as p:
+  with open(path, encoding="utf8") as p:
     lines = p.readlines()
     rows, columns, minimum_ingredients, maximum_area = map(int, lines[0].split())
     pizza = [[1 if c == "T" else 0 for c in line.strip()] for line in lines[1:]]
@@ -36,7 +37,7 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
     "Linear mapping into inverse"
     return y * rows + x
 
-  def conjoint(quad):
+  def conjoint(quad, inverse=inverse):
     "all others that are conjoint to quad"
     x1, x2, y1, y2, _ = quad
     cj = {quad}
@@ -45,10 +46,10 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
         cj |= inverse[at(x, y)]
     return cj
 
-  def quadsum(quad):
+  def quadsum(quad, pizza=pizza):
     "Returns the sum of all values within a quad"
     x1, x2, y1, y2, _ = quad
-    return sum(sum(row[x1: x2 + 1]) for row in pizza[y1: y2 + 1])
+    return sum(sum(row[x1 : x2 + 1]) for row in pizza[y1 : y2 + 1])
 
   def quadarea(quad):
     "Returns only the area of a quad"
@@ -106,7 +107,7 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
     """
     Only 999936 of 1000000 area is coverable
     (445, 0) (952, 0) (189, 13) (838, 18) (325, 26) (697, 53) (285, 54) (87, 60) (998, 61) (999, 62) (559, 146) (823, 153) (893, 167) (549, 176) (0, 202) (0, 203) (781, 214) (9, 239) (239, 253) (1, 262) (716, 296) (999, 333) (70, 336) (179, 349) (179, 350) (271, 359) (0, 362) (797, 366) (433, 390) (142, 395) (65, 402) (382, 411) (384, 411) (616, 412) (865, 413) (488, 429) (207, 470) (347, 472) (347, 473) (571, 473) (584, 481) (798, 502) (798, 504) (0, 530) (998, 541) (0, 575) (605, 592) (635, 614) (604, 629) (493, 651) (746, 669) (922, 721) (558, 725) (803, 765) (363, 779) (461, 809) (34, 838) (273, 838) (138, 863) (587, 908) (867, 908) (500, 917) (3, 924) (234, 957)
-    """
+    """  # noqa: E501
   else:
     print(f"We can cover all {coverable_area} area")
   print(f"Viable area is {viable_area}")
@@ -116,8 +117,8 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
   print(f"{candidate_count} candidates")
 
   # Search for best solution
-  use = "fill" or "fill" or "fit" or "SAT"
-  use = "fit" if path in ["example.in", "small.in"] and use == "fill" else use  # force "fit" when trivial
+  use = "fill"  # "fill" or "fit" or "SAT"
+  use = "fit" if path in {"example.in", "small.in"} and use == "fill" else use  # force "fit" when trivial
   fast_fill = use == "fill"  # fast_fill is a single iteration of first_fit (so max-first)
   first_fit = use == "fit"
   SAT = use == "SAT"

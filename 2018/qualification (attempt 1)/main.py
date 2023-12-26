@@ -5,7 +5,7 @@ for path in ["a_example", "b_should_be_easy", "c_no_hurry", "d_metropolis", "e_h
   rows, columns, fleet_size, ride_count, bonus, sim_length = 0, 0, 0, 0, 0, 0
 
   # Harley's function
-  def score(car, ride):
+  def score(car, ride, bonus=bonus):
     ride_length = abs(ride["a"] - ride["x"]) + abs(ride["b"] - ride["y"])
     start_time = abs(ride["a"] - car["last_x"]) - abs(ride["b"] - car["last_y"]) + car["next_free"]
     points = 0
@@ -13,15 +13,15 @@ for path in ["a_example", "b_should_be_easy", "c_no_hurry", "d_metropolis", "e_h
       points = ride_length + (bonus if start_time <= ride["s"] else 0)
     return points
 
-  with open(f"{path}.in") as f:
+  with open(f"{path}.in", encoding="utf8") as f:
     lines = f.readlines()
     rows, columns, fleet_size, ride_count, bonus, sim_length, *_ = map(int, (lines[0]).split(" "))
 
     for i, line in enumerate(lines[1:]):
-      a, b, x, y, s, f = (int(x) for x in line.split(" "))  # start row, start columns, end row, end column, start time, end time
+      a, b, x, y, s, e = (int(x) for x in line.split(" "))  # start row, start columns, end row, end column, start time, end time
       ride_length = abs(a - x) + abs(b - y)
-      # assert(ride_length <= abs(f-s))
-      rides.append({"i": i, "a": a, "b": b, "x": x, "y": y, "s": s, "f": f, "r": ride_length, "q": []})
+      # assert(ride_length <= abs(e-s))
+      rides.append({"i": i, "a": a, "b": b, "x": x, "y": y, "s": s, "f": e, "r": ride_length, "q": []})
 
     print(rows, "*", columns, "area,", sim_length, "steps,", fleet_size, "cars,", ride_count, "rides,", len(rides), "viable,", bonus, "bonus")
 
@@ -41,7 +41,7 @@ for path in ["a_example", "b_should_be_easy", "c_no_hurry", "d_metropolis", "e_h
       start_time = abs(ride["a"] - car["last_x"]) - abs(ride["b"] - car["last_y"]) + car["next_free"]
       car["next_free"] = ride_length + max(start_time, ride["s"])
 
-  with open(f"{path}.out", mode="w") as o:
+  with open(f"{path}.out", mode="w", encoding="utf8") as o:
     for car in fleet:
       i, next_free, last_x, last_y, history = car
       o.write(f"{len(car['history'])} ")

@@ -6,13 +6,13 @@ from tqdm import tqdm
 import numpy as np
 
 
-def main():
+def main():  # noqa: PLR0915, PLR0914
   ...  # CyCloMaTiC CoMPleXiTy ToO HiGH
   files = list(Path().glob("*.in"))
   print(f"Found {len(files)} input files")
   for path in files:
     name, lines = path.stem, []
-    with open(path) as o:
+    with open(path, encoding="utf8") as o:
       lines = o.readlines()
     # rows, columns, fleet size, number of rides, bonus for starting on time, time range of sim (1..T inc.)
     R, C, F, N, B, T = map(int, lines[0].split())
@@ -27,17 +27,17 @@ def main():
 
     # "efficiency"
     np_int = np.int64
-    if 2**7 > N:
+    if N < 2**7:
       np_int = np.int8
-    elif 2**15 > N:
+    elif N < 2**15:
       np_int = np.int16
-    elif 2**31 > N:
+    elif N < 2**31:
       np_int = np.int32
-    elif 2**63 <= N:
-      raise ValueError(f"Too many rides N ({N}), needs to be storable in an int64")
+    elif N >= 2**63:
+      raise ValueError(f"Too many rides N ({N}), needs to be storable in an int64")  # noqa: TRY003
     fleet = np.negative(np.ones((F, N), dtype=np_int))  # -1 is our "empty" value
     for ride in range(N):
-      for i, car in enumerate(fleet):
+      for i, _ in enumerate(fleet):
         if ride % F == i:
           fleet[i, ride // F] = ride
 
@@ -64,9 +64,9 @@ def main():
           for _ in range(generations):
             # modify columns in batches
             for column in range(ceil(F / width)):
-              column = min(column * width + radius, N - 1)
-              swaps = zip(sample(range(F), take), sample(range(F), take))
-              gives = zip(sample(range(F), give), sample(range(F), give))
+              column = min(column * width + radius, N - 1)  # noqa: PLW2901
+              swaps = zip(sample(range(F), take), sample(range(F), take), strict=False)
+              gives = zip(sample(range(F), give), sample(range(F), give), strict=False)
               # swap values
               for a, b in swaps:
                 target = min(column + randint(-radius, radius), N - 1)
@@ -85,7 +85,7 @@ def main():
               for i in car[car >= 0]:
                 ride, start_time = rides[i], time
                 arrival = time + abs(ride[0] - x) + abs(ride[1] - y)
-                time = arrival if arrival >= ride[4] else ride[4]
+                time = max(arrival, ride[4])
                 time += ride[6]  # we can go the distance
                 x, y = ride[2], ride[3]
                 score += ride[6] + (B if start_time == ride[4] else 0) if 0 < time < T and time <= ride[5] else 0
@@ -101,7 +101,7 @@ def main():
     except KeyboardInterrupt:
       print(f"Stopped by user, {score} score")
 
-    with open(f"{name}.out", "w") as o:
+    with open(f"{name}.out", "w", encoding="utf8") as o:
       for car in fleet:
         assigned = list(map(str, car[car >= 0]))
         if len(assigned):

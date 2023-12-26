@@ -2,11 +2,10 @@ from dataclasses import dataclass
 from math import log
 
 
-@dataclass
+@dataclass(slots=True)
 class Street:
-  __slots__ = ["startsAt", "endsAt", "length", "weight"]
-  startsAt: int
-  endsAt: int
+  starts_at: int
+  ends_at: int
   length: int
   weight: int
 
@@ -17,26 +16,26 @@ class Intersection:
   ID: int
   inputs: list[Street]  # Streets that end here
   outputs: list[Street]  # Streets that start here
-  order: list[(str, int)]  # "order and duration" of green lights, list of (street name, time T) pairs
+  order: list[tuple[str, int]]  # "order and duration" of green lights, list of (street name, time T) pairs
 
   def __str__(self):
     return f"{self.ID}\n{len(self.order)}\n{chr(10).join(f'{sn} {T}' for sn, T in self.order)}\n"  # chr(10) is "\n"
 
 
 def read(name):
-  with open(f"{name}.txt") as f:
+  with open(f"{name}.txt", encoding="utf8") as f:
     lines = [line.split() for line in f.readlines()]
-  D, I, S, V, F = map(int, lines[0])
-  streets = {SN: Street(int(B), int(E), int(L), 0) for B, E, SN, L in lines[1: S + 1]}
-  paths = [streets for _, *streets in lines[S + 1:]]
-  intersections = [Intersection(i, [], [], []) for i in range(I)]
+  D, N, S, V, F = map(int, lines[0])
+  streets = {SN: Street(int(B), int(E), int(L), 0) for B, E, SN, L in lines[1 : S + 1]}
+  paths = [streets for _, *streets in lines[S + 1 :]]
+  intersections = [Intersection(i, [], [], []) for i in range(N)]
   for streetname, street in streets.items():
-    intersections[street.endsAt].inputs.append(streetname)
-    intersections[street.startsAt].outputs.append(streetname)
-  return D, I, S, V, F, streets, paths, intersections
+    intersections[street.ends_at].inputs.append(streetname)
+    intersections[street.starts_at].outputs.append(streetname)
+  return D, N, S, V, F, streets, paths, intersections
 
 
-def solve(name, D, I, S, V, F, streets, paths, intersections):
+def solve(name, D, N, S, V, F, streets, paths, intersections):  # noqa: PLR0913, PLR0917
   streets: dict[str, Street]  # street name -> Street
   paths: list[list[str]]  # each path is an ordered list of streets
   intersections: list[Intersection]  # ID -> Intersection
@@ -69,6 +68,6 @@ def solve(name, D, I, S, V, F, streets, paths, intersections):
 if __name__ == "__main__":
   for name in "abcdef":
     intersections = solve(name, *read(name))
-    with open(f"{name}.out", "w+") as f:
+    with open(f"{name}.out", "w+", encoding="utf8") as f:
       f.write(f"{len(intersections)}\n")
       f.writelines(map(str, intersections))

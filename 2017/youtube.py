@@ -12,12 +12,12 @@ console = True
 # Get our input data
 path = input("Input File: ")
 source, ext = path.split(sep=".") if len(path.split(sep=".")) == 2 else path.split(sep=".")[0], "in"
-with open(path) as p:
+with open(path, encoding="utf8") as p:
   next_endpoint = 2  # preset
   line_count = sum([1 for i in p])
   indices = range(line_count)
   p.seek(0)
-  for line, index in zip(p, indices):
+  for line, index in zip(p, indices, strict=False):
     values = [int(i) for i in line.split() if i.isdigit()]
 
     # Meta data
@@ -70,11 +70,11 @@ for endpoint in endpoints:
   endpoint[2].sort(key=itemgetter(1), reverse=True)
 
 # Generate unrequested, unrequested, empty, empty, caches
-for cache in cache_ids:
+for _ in cache_ids:
   caches.append(([], {}, 0, []))  # cache = (video requests by endpoints, aggregate requests for videos, MB used, videos stored in cache)
 
 # Elevate requests to cache-level
-for endpoint, endpoint_id in zip(endpoints, endpoint_ids):
+for endpoint, endpoint_id in zip(endpoints, endpoint_ids, strict=False):
   for linked_cache in endpoint[1]:
     cache_id, latency_to_cache = linked_cache
     for request in endpoint[2]:
@@ -98,7 +98,7 @@ def priority(video_id):
   latency = 0
 
   for cache in caches:
-    for request, cache_id in zip(cache, cache_ids):
+    for request, cache_id in zip(cache, cache_ids, strict=False):
       if request[cache_id][1] == video_id:
         request_no += request[0]
         endpoint_no.append(request[3])
@@ -117,7 +117,7 @@ def priority(video_id):
 # latency between all endpoints that are requesting such.
 
 # Greedy initial priority score for each cache, for each video score
-for cache, cache_id in zip(caches, cache_ids):
+for cache, cache_id in zip(caches, cache_ids, strict=False):
   requested_videos = {}
   for request in cache[0]:
     request_count, video_id, latency, endpoint_id = request
@@ -195,7 +195,7 @@ while space_for_videos and videos_to_cache:
     for video_id in remove_from_priorities:
       del video_priorities[video_id]
 
-utilised_caches = [(sorted(cache[3]), cache_id) for cache, cache_id in zip(caches, cache_ids) if cache[2] > 0 and cache[2] <= cache_size]
+utilised_caches = [(sorted(cache[3]), cache_id) for cache, cache_id in zip(caches, cache_ids, strict=False) if cache[2] > 0 and cache[2] <= cache_size]
 utilised_cache_count = len(utilised_caches)
 print(f"Utilised {utilised_cache_count} caches")
 print(f"Caches: {utilised_caches}")
@@ -238,7 +238,7 @@ print(f"Optimal: {optimum_savings}")
 print(f"Efficiency: {score / optimum_savings:%}")
 
 # Output submission file
-with open(source + ".out", mode="w") as o:
+with open(f"{source}.out", mode="w", encoding="utf8") as o:
   o.write(f"{utilised_cache_count}\n")
 
   for cache, cache_id in utilised_caches:

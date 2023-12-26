@@ -35,16 +35,16 @@ SCORE = 0
 for p in Path("data/").glob("*.in.txt"):
   p_name = p.name.split(".")[0]
   # a and b are solvable by hand, "4 cheese mushrooms peppers tomatoes" and "6 akuof byyii dlust luncl vxglq xveqd"
-  if p_name not in ["a_an_example", "b_basic"]:
+  if p_name not in {"a_an_example", "b_basic"}:
     lines = list(map(str.split, p.read_text().splitlines()))
     count = int(lines[0][0])  # not _actually_ needed but might as well
     liked_by, disliked_by = defaultdict(set), defaultdict(set)
     client_likes, client_dislikes = defaultdict(set), defaultdict(set)
-    for client, (likes, dislikes) in enumerate(zip(lines[1::2], lines[2::2])):
-      likes, dislikes = likes[1:], dislikes[1:]
-      for l in likes:
-        liked_by[l].add(client)
-        client_likes[client].add(l)
+    for client, (likes, dislikes) in enumerate(zip(lines[1::2], lines[2::2], strict=False)):
+      likes, dislikes = likes[1:], dislikes[1:]  # noqa: PLW2901
+      for like in likes:
+        liked_by[like].add(client)
+        client_likes[client].add(like)
       for d in dislikes:
         disliked_by[d].add(client)
         client_dislikes[client].add(d)
@@ -52,7 +52,7 @@ for p in Path("data/").glob("*.in.txt"):
     ingredient_pool = set(liked_by) | set(disliked_by)
     liked_by, disliked_by = lensort(liked_by), lensort(disliked_by)
 
-    def score(pizza: set):
+    def score(pizza: set, client_likes=client_likes, client_dislikes=client_dislikes):
       score = 0
       for client, likes in client_likes.items():
         if len(likes & pizza) == len(likes) and len(client_dislikes[client] & pizza) == 0:
@@ -61,7 +61,7 @@ for p in Path("data/").glob("*.in.txt"):
 
     if True:  # that's a lot of printing
 
-      def writestats(which, d):
+      def writestats(which, d, p_name=p_name):
         with open(f"{p_name}.{which}.txt", "w+", encoding="utf8", newline="\n") as f:
           ds = dictsplat(d)
           ls = list(ds.values())
