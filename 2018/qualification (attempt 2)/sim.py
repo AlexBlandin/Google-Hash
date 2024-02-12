@@ -13,18 +13,18 @@ R, C, F, N, B, T = list(map(int, lines[0].split()))
 # rides[0] = a, b, x, y, s, f
 # a, b, x, y = start intersection row, start intersection column, end intersection row, end intersection column
 # s, f = earliest start, latest allowed finish (f <= T)
-rides = list(map(lambda a: list(map(int, a.split())), lines[1:]))
+rides = [list(map(int, a.split())) for a in lines[1:]]
 for ride in rides:
   ride.append(abs(ride[0] - ride[2]) + abs(ride[1] - ride[3]))
 
 fleet, np_int = None, np.int64
-if N < 2**7:
+if 2**7 > N:
   np_int = np.int8
-elif N < 2**15:
+elif 2**15 > N:
   np_int = np.int16
-elif N < 2**31:
+elif 2**31 > N:
   np_int = np.int32
-elif N >= 2**63:
+elif 2**63 <= N:
   print(f"Too many rides ({N}) for numpy, needs to be storable in an int64")
 fleet = np.negative(np.ones((F, N), dtype=np_int))
 fleet[0, 0] = 2

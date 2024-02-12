@@ -5,7 +5,7 @@ from typing import Any
 
 
 def splat(d: dict[Any, set]):
-  "take these maps of sets and splat them out as k*|v| and flatten"
+  """Take these maps of sets and splat them out as k*|v| and flatten."""
   r = []
   for k, v in d.items():
     r += [k] * len(v)
@@ -17,17 +17,17 @@ def dictsplat(d: dict[Any, set]):
 
 
 def lenmode(d: dict[Any, set]):
-  "the lemonade function"
+  """The lemonade function."""
   return mode(splat(d)) if len(d) else None
 
 
 def lenmax(d: dict[Any, set]):
-  "the host with the most"
+  """The host with the most."""
   return max(d, key=lambda k: len(d[k]))
 
 
 def lensort(d: dict[Any, set], reverse=False) -> dict[Any, set]:
-  "sort it by the cardinality of the internal set, smallest to largest by default"
+  """Sort it by the cardinality of the internal set, smallest to largest by default."""
   return dict(sorted(d.items(), key=lambda kv: len(kv[1]), reverse=reverse))
 
 
@@ -68,7 +68,7 @@ for p in Path("data/").glob("*.in.txt"):
           f.write("occurences:\n")
           f.write("\n".join([f"{i}: {ls.count(i)}" for i in range(ls[0], ls[-1] + 1)]))
           f.write("\n\ningredient popularity\n")
-          f.write("\n".join(map(lambda ab: f"{ab[0]}: {ab[1]}", ds.items())))
+          f.write("\n".join(f"{ab[0]}: {ab[1]}" for ab in ds.items()))
 
       writestats("likes", liked_by)
       writestats("dislikes", disliked_by)

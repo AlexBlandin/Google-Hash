@@ -18,7 +18,7 @@ class Intersection:
   outputs: list[Street]  # Streets that start here
   order: list[tuple[str, int]]  # "order and duration" of green lights, list of (street name, time T) pairs
 
-  def __str__(self):
+  def __str__(self) -> str:
     return f"{self.ID}\n{len(self.order)}\n{chr(10).join(f'{sn} {T}' for sn, T in self.order)}\n"  # chr(10) is "\n"
 
 
@@ -35,7 +35,7 @@ def read(name):
   return D, N, S, V, F, streets, paths, intersections
 
 
-def solve(name, D, N, S, V, F, streets, paths, intersections):  # noqa: PLR0913, PLR0917
+def solve(name, D, N, S, V, F, streets, paths, intersections):  # noqa: PLR0913
   streets: dict[str, Street]  # street name -> Street
   paths: list[list[str]]  # each path is an ordered list of streets
   intersections: list[Intersection]  # ID -> Intersection
@@ -48,10 +48,12 @@ def solve(name, D, N, S, V, F, streets, paths, intersections):  # noqa: PLR0913,
 
   def curve(t: int, weight: int, inputCount: int) -> int:
     return min(
-      max(round((D - 1) * (log(weight + 1) - log(minWeight + 1)) / max((log(maxWeight + 1) - log(minWeight + 1)) + 1, 1)) // 256, 1), D
+      max(round((D - 1) * (log(weight + 1) - log(minWeight + 1)) / max((log(maxWeight + 1) - log(minWeight + 1)) + 1, 1)) // 256, 1),
+      D,
     )  # logarithmic mapping of minWeight^2..maxWeight^2 to 1..D
     return min(
-      max(round((D - 1) * ((weight**2) - (minWeight**2)) / max(((maxWeight) - (minWeight)) + 1, 1)) // 64, 1), D
+      max(round((D - 1) * ((weight**2) - (minWeight**2)) / max(((maxWeight) - (minWeight)) + 1, 1)) // 64, 1),
+      D,
     )  # quadratic mapping of minWeight^2..maxWeight^2 to 1..D
     return min(max(round((D - 1) * (weight - minWeight) / max((maxWeight - minWeight) + 1, 1)) // 64, 1), D)  # linear mapping of minWeight..maxWeight to 1..D
     return t  # identity mapping (works ~~infuriatingly~~ surprisingly well)

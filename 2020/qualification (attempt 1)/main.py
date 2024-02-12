@@ -1,4 +1,4 @@
-from operator import itemgetter, attrgetter
+from operator import attrgetter, itemgetter
 from pathlib import Path
 from time import time
 
@@ -17,8 +17,8 @@ pb = {
 }
 
 
-def main():  # noqa: PLR0914
-  for path in sorted(list(Path().glob("*.txt"))):
+def main():
+  for path in sorted(Path().glob("*.txt")):
     Libs, name = [], path.stem
     with open(path, encoding="utf8") as o:
       lines = o.readlines()
@@ -26,7 +26,7 @@ def main():  # noqa: PLR0914
       for i, NTMbooks in enumerate(zip(lines[2::2], lines[3::2], strict=False)):
         lib, NTM, books = Struct(), *NTMbooks
         lib.i, lib.send, lib.N, lib.T, lib.M = i, [], *map(int, NTM.split())
-        lib.books = sorted(list(map(lambda b: (b, BookScores[b]), map(int, books.split()))), key=itemgetter(1), reverse=True)
+        lib.books = sorted(((b, BookScores[b]) for b in map(int, books.split())), key=itemgetter(1), reverse=True)
         Libs.append(lib)
     print(f"\n{name}:")
     starttime = time()
@@ -43,7 +43,7 @@ def main():  # noqa: PLR0914
     def selection_strategy(lib):
       return sum(map(itemgetter(1), lib.books)) / (lib.T * lib.M)
 
-    sent, sign_up, queue = set(), Libs[0], dict(map(lambda lib: (lib.i, lib), Libs))
+    sent, sign_up, queue = set(), Libs[0], {lib.i: lib for lib in Libs}
     t, dt = 0, sign_up.T
     while t < D and len(queue):
       t += dt
@@ -65,7 +65,7 @@ def main():  # noqa: PLR0914
           break
 
     print(f"{len(sent)}/{B} books sent (from {L - len(queue)}/{L} libraries)")
-    print(f"{sum(map(lambda b: BookScores[b], sent))} score (vs {pb[name]}) in {time() - starttime:.2f}s")
+    print(f"{sum(BookScores[b] for b in sent)} score (vs {pb[name]}) in {time() - starttime:.2f}s")
 
     # Write them out to the files
     Libs = [lib for lib in Libs if len(lib.send)]

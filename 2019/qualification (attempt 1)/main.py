@@ -1,7 +1,7 @@
-from operator import itemgetter, not_
 from itertools import chain
-from random import sample
+from operator import itemgetter, not_
 from pathlib import Path
+from random import sample
 
 
 def div(x, y):
@@ -12,7 +12,7 @@ def main():
   for File in Path().glob("*_*.txt"):
     photos, cv, horizontal, indices = [], [], [], {}
     with open(File, encoding="utf8") as o:
-      photos = list(map(lambda s: (s[1].strip().split()[0] == "H", (s[0], set(s[1].strip().split()[2:]))), enumerate(o.readlines(), start=-1)))[1:]
+      photos = [(s[1].strip().split()[0] == "H", (s[0], set(s[1].strip().split()[2:]))) for s in enumerate(o.readlines(), start=-1)][1:]
       (*horizontal,) = map(itemgetter(1), filter(itemgetter(0), photos))
       (*cv,) = map(itemgetter(1), filter(not_, map(itemgetter(0), photos)))
 
@@ -53,7 +53,7 @@ def main():
     print(f"Such as {sample(photos, 1)[0]}")
     print(f"It has {len(horizontal)} horizontal and {len(vertical)} vertical images")
     print(f"Its most unique tag is shared by {min(map(len, indices.values()))} photos")
-    ic = list(sorted(map(len, indices.values())))
+    ic = sorted(map(len, indices.values()))
     lic = len(ic)
     print(f"Its median tag is shared by {ic[lic // 2]} photos")
     print(f"Its 95th% tag is shared by {ic[int(lic * 0.95)]} photos")

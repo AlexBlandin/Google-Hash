@@ -21,11 +21,11 @@ for path in ["a_example", "b_lovely_landscapes", "c_memorable_moments", "d_pet_p
     tags[tag].sort(key=lambda image: len(images[image]["tags"]), reverse=True)
     tags[tag].sort(key=lambda image: images[image]["tags"])
 
-  for tag in [t for t in tags][:5]:
+  for tag in list(tags)[:5]:
     print(f"{tag}: " + str(tags[tag] if len(tags[tag]) < 5 else (f"{tags[tag][:5]}"[:-1] + ", ... "))[1:-1])
 
   if path in {"c_memorable_moments", "d_pet_pictures"}:
-    temp = {tag: i for tag, i in zip(tags, range(len(tags)), strict=False)}
+    temp = dict(zip(tags, range(len(tags)), strict=False))
     tags = temp
     for image in images:
       image["tags"].sort(key=lambda tag: tags[tag])

@@ -17,7 +17,7 @@ def read(name):
   return D, N, S, V, F, streets, paths, intersections
 
 
-def solve(name, D, N, S, V, F, streets, paths, intersections):  # noqa: PLR0913, PLR0917
+def solve(name, D, N, S, V, F, streets, paths, intersections):  # noqa: PLR0913
   for path in paths:
     for street in path:
       streets[street].weight += 1

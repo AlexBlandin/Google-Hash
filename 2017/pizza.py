@@ -34,11 +34,11 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
   print(f"Rows: {rows} rows, {columns} columns, {minimum_ingredients} ingredients minimum, {maximum_area} area maximum")
 
   def at(x, y, rows=rows):
-    "Linear mapping into inverse"
+    """Linear mapping into inverse."""
     return y * rows + x
 
   def conjoint(quad, inverse=inverse):
-    "all others that are conjoint to quad"
+    """All others that are conjoint to quad."""
     x1, x2, y1, y2, _ = quad
     cj = {quad}
     for y in range(y1, y2 + 1):
@@ -47,17 +47,17 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
     return cj
 
   def quadsum(quad, pizza=pizza):
-    "Returns the sum of all values within a quad"
+    """Returns the sum of all values within a quad."""
     x1, x2, y1, y2, _ = quad
     return sum(sum(row[x1 : x2 + 1]) for row in pizza[y1 : y2 + 1])
 
   def quadarea(quad):
-    "Returns only the area of a quad"
+    """Returns only the area of a quad."""
     # _, _, _, _, area = quad
     return quad[-1]
 
   def sufficient(quad, mi=minimum_ingredients, ma=maximum_area):
-    "Finds if a quadrangle has sufficient ingredients"
+    """Finds if a quadrangle has sufficient ingredients."""
     tomatoes, area = quadsum(quad), quadarea(quad)
     mushrooms = area - tomatoes
     return tomatoes >= mi and mushrooms >= mi and area <= ma

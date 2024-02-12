@@ -1,33 +1,35 @@
-from multiprocessing import Pool
-from random import sample, randint
 from itertools import count
 from math import ceil
-from tqdm import tqdm
+from multiprocessing import Pool
+from random import randint, sample
+
 import numpy as np
+from tqdm import tqdm
 
 
-def main(queue, lines):  # noqa: PLR0914
+def main(queue, lines):
   # rows, columns, fleet size, number of rides, bonus for starting on time, time range of sim (1..T inc.)
   _R, _C, F, N, B, T = map(int, lines[0].split())
 
   # rides[0] = a, b, x, y, s, f
   # a, b, x, y = start intersection row, start intersection column, end intersection row, end intersection column
   # s, f = earliest start, latest allowed finish (f <= T)
-  (*rides,) = map(lambda a: list(map(int, a.split())), lines[1:])
+  (*rides,) = (list(map(int, a.split())) for a in lines[1:])
   for ride in rides:
     ride.append(abs(ride[0] - ride[2]) + abs(ride[1] - ride[3]))
   # print(f"{name}: R, C, F, N, B, T = {R, C, F, N, B, T}")
 
   # "efficiency"
   np_int = np.int64
-  if N < 2**7:
+  if 2**7 > N:
     np_int = np.int8
-  elif N < 2**15:
+  elif 2**15 > N:
     np_int = np.int16
-  elif N < 2**31:
+  elif 2**31 > N:
     np_int = np.int32
-  elif N >= 2**63:
-    raise ValueError(f"Too many rides N ({N}), needs to be storable in an int64")  # noqa: TRY003
+  elif 2**63 <= N:
+    msg = f"Too many rides N ({N}), needs to be storable in an int64"
+    raise ValueError(msg)
   fleet = np.negative(np.ones((F, N), dtype=np_int))  # -1 is our "empty" value
   for ride in range(N):
     for i, _ in enumerate(fleet):
