@@ -102,7 +102,7 @@ for p in Path("data/").glob("*.in.txt"):
     # the trivial start, liked things that are not disliked, basically freebies
     on_the_pizza = set(liked_by) - set(disliked_by)
 
-    # TODO: figure out what comes next
+    # TODO(alex): figure out what comes next
 
     # there's a natural interpretation as looking for "maximumum coverage" of a CNF
     # so if c_1 = {A, B}, and c_2 = {C, !D}, and c_3 = {E, F, !C}

@@ -68,7 +68,7 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
     return x1 > a2 or x2 < a1 or y1 > b2 or y2 < b1  # idk, micro-opt but maybe this is faster
     # return not (x1 <= a2 and x2 >= a1 and y1 <= b2 and y2 >= b1)
 
-  def disjoint_from(quad, quads):  # TODO: speedup majorly bc ~5000 in medium is real slow (and big? oh my)
+  def disjoint_from(quad, quads):  # TODO(alex): speedup majorly bc ~5000 in medium is real slow (and big? oh my)
     return all(disjoint(quad, other) for other in quads)
 
   # Calculates appropriate sizes of quadrangle slices
@@ -95,7 +95,7 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
               for x in range(x1, x2 + 1):
                 inverse[at(x, y)].add(quad)  # inverse peaks at 2.7GB on big.in
   assert len(candidates)
-  coverable_area = sum(map(bool, map(len, inverse)))  # TODO: HECKIN BUG HERE SOMETHING'S OFF WE'RE UNDERESTIMATING
+  coverable_area = sum(map(bool, map(len, inverse)))  # TODO(alex): HECKIN BUG HERE SOMETHING'S OFF WE'RE UNDERESTIMATING
   viable_area = coverable_area - quadarea(candidates[-1])  # so based on smallest slice
 
   if coverable_area != total_area:
