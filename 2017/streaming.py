@@ -1,4 +1,11 @@
+"""
+Google Hash 2017 qualifier.
+
+Copyright 2020 Alex Blandin
+"""
+
 from operator import itemgetter
+from pathlib import Path
 
 files = ["me_at_the_zoo"]
 
@@ -8,7 +15,7 @@ for path in files:
   caches = []  # [[video_id: N]]
 
   video_count, endpoint_count, request_count, cache_count, cache_size = 0, 0, 0, 0, 0
-  with open(f"{path}.in", encoding="utf8") as f:
+  with Path(f"{path}.in").open(encoding="utf8") as f:
     next_endpoint = 2
     line_no = -1
     for _line in f:
@@ -20,20 +27,23 @@ for path in files:
         video_count, endpoint_count, request_count, cache_count, cache_size = line
         caches = [{}] * cache_count
         endpoint_ids, cache_ids, video_ids = range(endpoint_count), range(cache_count), range(video_count)
-        print(f"{video_count} videos, {endpoint_count} endpoints, {request_count} requests, {cache_count} {cache_size} MB caches")
+        print(
+          f"{video_count} videos, {endpoint_count} endpoints, {request_count} requests, "
+          f"{cache_count} {cache_size} MB caches"
+        )
 
       # init videos
       elif line_no == 1:
         videos.extend({"size": size, "endpoints": [], "cache_candidates": set()} for size in line if size <= cache_size)
 
       # init endpoints
-      elif line_no == next_endpoint and len(line) == 2:
+      elif line_no == next_endpoint and len(line) == 2:  # noqa: PLR2004
         latency_to_server, expected_caches = line
         next_endpoint = line_no + expected_caches + 1
         endpoints.append({"latency_to_server": latency_to_server, "connected_caches": []})
 
       # connect caches to endpoints
-      elif len(line) == 2:
+      elif len(line) == 2:  # noqa: PLR2004
         cache_id, latency_to_cache = line
         if latency_to_cache < endpoints[-1]["latency_to_server"]:
           endpoints[-1]["connected_caches"].append({"cache_id": cache_id, "latency_to_cache": latency_to_cache})
@@ -59,24 +69,28 @@ for path in files:
             video["request_count"] += request_count
             video["sum_latency_to_server"] += endpoints[endpoint_id]["latency_to_server"]
             video["sum_latency_to_cache"] += latency_to_cache
-            video["score"] = video["request_count"] * (video["sum_latency_to_server"] - video["sum_latency_to_cache"]) / video["size"]
+            video["score"] = (
+              video["request_count"] * (video["sum_latency_to_server"] - video["sum_latency_to_cache"]) / video["size"]
+            )
             video["cache_candidates"].add(cache_id)
 
-  for _cache in endpoints[endpoint_id]["connected_caches"]:  # type: ignore
+  for _cache in endpoints[endpoint_id]["connected_caches"]:  # type: ignore  # noqa: PGH003
     cache = caches[_cache["cache_id"]]
     for video in cache:
-      video = cache[video_id]  # type: ignore # noqa: PLW2901
-      video["score"] = video["request_count"] * (video["sum_latency_to_server"] - video["sum_latency_to_cache"]) / video["size"]
+      video = cache[video_id]  # type: ignore  # noqa: PGH003, PLW2901
+      video["score"] = (
+        video["request_count"] * (video["sum_latency_to_server"] - video["sum_latency_to_cache"]) / video["size"]
+      )
 
   temp_caches = [sorted(cache.values(), key=itemgetter("score"), reverse=True) for cache in caches]
 
   caches = temp_caches
 
   # output submission file
-  with open(f"{path}.out", mode="w", encoding="utf8") as o:
+  with Path(f"{path}.out").open(mode="w", encoding="utf8") as o:
     o.write(f"{len(caches)}\n")
-    for videos, chache_id in zip(caches, range(len(caches)), strict=False):  # noqa: B007
-      o.write(f"{cache_id}")  # type: ignore
+    for videos, cache_id in zip(caches, range(len(caches)), strict=False):
+      o.write(f"{cache_id}")
       for video in videos:
         o.write(f" {video['video_id']}")
       o.write("\n")

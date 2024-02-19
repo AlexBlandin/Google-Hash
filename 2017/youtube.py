@@ -1,4 +1,11 @@
+"""
+Google Hash 2017 qualifier.
+
+Copyright 2020 Alex Blandin
+"""
+
 from operator import itemgetter
+from pathlib import Path
 
 video_count, endpoint_count, request_count, cache_count, cache_size = 0, 0, 0, 0, 0
 endpoints, endpoint_ids, caches, cache_ids, video_sizes, video_ids = [], [], [], [], [], []
@@ -11,8 +18,8 @@ console = True
 
 # Get our input data
 path = input("Input File: ")
-source, ext = path.split(sep=".") if len(path.split(sep=".")) == 2 else path.split(sep=".")[0], "in"
-with open(path, encoding="utf8") as p:
+source, ext = path.split(sep=".") if len(path.split(sep=".")) == 2 else path.split(sep=".")[0], "in"  # noqa: PLR2004
+with Path(path).open(encoding="utf8") as p:
   next_endpoint = 2  # preset
   line_count = sum([1 for i in p])
   indices = range(line_count)
@@ -25,7 +32,10 @@ with open(path, encoding="utf8") as p:
       video_count, endpoint_count, request_count, cache_count, cache_size = values
       endpoint_ids, cache_ids, video_ids = range(endpoint_count), range(cache_count), range(video_count)
       # video_priorities = [[] for i in video_ids]
-      print(f"{video_count} videos, {endpoint_count} endpoints, {request_count} requests, {cache_count} caches (each is {cache_size} MB)")
+      print(
+        f"{video_count} videos, {endpoint_count} endpoints, {request_count} requests, "
+        f"{cache_count} caches (each is {cache_size} MB)"
+      )
 
     # Video sizes
     elif index == 1:
@@ -34,18 +44,19 @@ with open(path, encoding="utf8") as p:
       # max_video_size = max(video_sizes) # currently not using, so not bothering to calculate
 
     # Endpoint
-    elif index == next_endpoint and len(values) == 2:
+    elif index == next_endpoint and len(values) == 2:  # noqa: PLR2004
       latency_to_server, expected_caches = values
       next_endpoint = index + expected_caches + 1
       endpoint = (latency_to_server, [], [])  # endpoint = (latency to server, cache links, video requests)
       endpoints.append(endpoint)
 
     # Cache, connect cache to last endpoint
-    elif len(values) == 2:
+    elif len(values) == 2:  # noqa: PLR2004
       cache_id, latency_to_cache = values
       endpoint = endpoints[-1]
 
-      # If this cache is lower latency than just connecting to the server, then it is useful, otherwise it's a waste of processing
+      # If this cache is lower latency than just connecting to the server, then it is useful
+      # otherwise it's a waste of processing
       if latency_to_cache < endpoint[0]:
         endpoint[1].append((cache_id, latency_to_cache))
 
@@ -55,7 +66,8 @@ with open(path, encoding="utf8") as p:
       endpoint = endpoints[endpoint_requesting]
       endpoint[2].append((video_id, specific_requests_count))
 
-# Calculate theoretically optimal time savings given infinitely large caches -- likely impossible to match given cache size restraints
+# Calculate theoretically optimal time savings given infinitely large caches
+# (likely impossible to match given cache size restraints)
 optimum_savings = 0
 for endpoint in endpoints:
   lowest_latency = endpoint[0]
@@ -71,7 +83,9 @@ for endpoint in endpoints:
 
 # Generate unrequested, unrequested, empty, empty, caches
 for _ in cache_ids:
-  caches.append(([], {}, 0, []))  # cache = (video requests by endpoints, aggregate requests for videos, MB used, videos stored in cache)
+  caches.append(
+    ([], {}, 0, [])
+  )  # cache = (video requests by endpoints, aggregate requests for videos, MB used, videos stored in cache)
 
 # Elevate requests to cache-level
 for endpoint, endpoint_id in zip(endpoints, endpoint_ids, strict=False):
@@ -83,7 +97,8 @@ for endpoint, endpoint_id in zip(endpoints, endpoint_ids, strict=False):
 
 # Auction loop design
 # ---
-# This code is meant to compare a video that a number has to a cache, to see if the cache has it. If it does, then it should
+# This code is meant to compare a video that a number has to a cache, to see if the cache has it.
+# If it does, then it should
 # # want to finish this?
 
 ...
@@ -92,7 +107,7 @@ for endpoint, endpoint_id in zip(endpoints, endpoint_ids, strict=False):
 # The purpose of priority is to find all endpoints that have the same video number as input,
 # and then add together all those requests together to rate them by priority.
 # It'll make use of the number of requests, along with the average lantecy, to calculate this.
-def priority(video_id):
+def priority(video_id) -> None:  # noqa: ANN001, D103
   request_no = 0
   endpoint_no = []
   latency = 0
@@ -123,36 +138,51 @@ for cache, cache_id in zip(caches, cache_ids, strict=False):
     request_count, video_id, latency, endpoint_id = request
     # Add video_id to requested_videos
     if video_id not in requested_videos:
-      requested_videos[video_id] = (
-        video_id,
-        0,
-        0,
-        0,
-        0,
-      )  # request = (video_id, sum_video_requests, sum_latency_to_caches, sum_latency_to_server, requesting_endpoints_count)
+      requested_videos[video_id] = (video_id, 0, 0, 0, 0)
+      # request = video_id, sum_video_requests, sum_latency_to_caches, sum_latency_to_server, requesting_endpoints_count
     old = requested_videos[video_id]  # current values for video
     latency_to_server = endpoints[endpoint_id][0]  # grab that endpoint's latency to the main server
-    requested_videos[video_id] = (video_id, old[0] + request_count, old[1] + latency_to_cache, old[2] + latency_to_server, old[3] + 1)  # type: ignore # update entry for video
+    requested_videos[video_id] = (
+      video_id,
+      old[0] + request_count,
+      old[1] + latency_to_cache,
+      old[2] + latency_to_server,
+      old[3] + 1,
+    )  # type: ignore # update entry for video  # noqa: PGH003
 
-  cache = (cache[0], requested_videos, cache[2], cache[3])  # update requested_videos dictionary in cache  # noqa: PLW2901
+  cache = (  # noqa: PLW2901
+    cache[0],
+    requested_videos,
+    cache[2],
+    cache[3],
+  )  # update requested_videos dictionary in cache
   for request in requested_videos:  # iterates over keys
-    video_id, sum_video_requests, sum_latency_to_caches, sum_latency_to_server, requesting_endpoints_count = requested_videos[request]
+    (
+      video_id,
+      sum_video_requests,
+      sum_latency_to_caches,
+      sum_latency_to_server,
+      requesting_endpoints_count,
+    ) = requested_videos[request]
     priority_score = request_count * (
       sum_latency_to_server - sum_latency_to_caches
     )  # quick and dirty (greedy) prioritisation -- negative is slower than latency to server
     if priority_score > 0:  # only bother if actually faster than going to the server
       if video_id not in video_priorities:
         video_priorities[video_id] = []
-      video_priorities[video_id].append((priority_score, cache_id))  # add cache's priority to the video_priorities list, for each video_id
+      video_priorities[video_id].append((priority_score, cache_id))
+      # add cache's priority to the video_priorities list, for each video_id
 
-# Packing -- "Greedy" in that it always fits in the highest priority videos if it can, starting from the highest and working towards the lowest
+# Packing -- "Greedy" in that it always fits in the highest priority videos if it can,
+# starting from the highest and working towards the lowest
 space_for_videos, videos_to_cache = True, True
 while space_for_videos and videos_to_cache:
   for video in video_priorities.values():
     video.sort(key=itemgetter(0), reverse=True)
 
   sorted_priorities = [
-    (video_id, video_priorities[video_id]) for video_id in sorted(video_priorities, key=lambda video_id: video_priorities[video_id][0][0], reverse=True)
+    (video_id, video_priorities[video_id])
+    for video_id in sorted(video_priorities, key=lambda video_id: video_priorities[video_id][0][0], reverse=True)
   ]
   video_priorities = {}
   for video_id, video in sorted_priorities:
@@ -165,13 +195,19 @@ while space_for_videos and videos_to_cache:
   for video_id, video in video_priorities.items():
     top = video.pop(0)
     if debug:
-      print(f"Video {video_id} in cache {top[1]} scores {top[0]}, is {video_sizes[video_id]} MB, cache contains {caches[top[1]][2]} MB")
+      print(
+        f"Video {video_id} in cache {top[1]} scores {top[0]}, "
+        f"is {video_sizes[video_id]} MB, cache contains {caches[top[1]][2]} MB"
+      )
     if top[0] > 0 and (video_sizes[video_id] + caches[top[1]][2]) <= cache_size:
       caches[top[1]][3].append(video_id)  # put video_id into the cache's list of stored videos
       old_cache = caches[top[1]]
       caches[top[1]] = (old_cache[0], old_cache[1], old_cache[2] + video_sizes[video_id], old_cache[3])
       if debug:
-        print(f"Video {video_id} added to cache {top[1]}, scores {top[0]}, is {video_sizes[video_id]} MB, cache contains {caches[top[1]][2]} MB")
+        print(
+          f"Video {video_id} added to cache {top[1]}, scores {top[0]}, "
+          f"is {video_sizes[video_id]} MB, cache contains {caches[top[1]][2]} MB"
+        )
     else:
       # for now, completely greedy
       # if we recalculate the priorities, we will do so here
@@ -195,7 +231,11 @@ while space_for_videos and videos_to_cache:
     for video_id in remove_from_priorities:
       del video_priorities[video_id]
 
-utilised_caches = [(sorted(cache[3]), cache_id) for cache, cache_id in zip(caches, cache_ids, strict=False) if cache[2] > 0 and cache[2] <= cache_size]
+utilised_caches = [
+  (sorted(cache[3]), cache_id)
+  for cache, cache_id in zip(caches, cache_ids, strict=False)
+  if cache[2] > 0 and cache[2] <= cache_size
+]
 utilised_cache_count = len(utilised_caches)
 print(f"Utilised {utilised_cache_count} caches")
 print(f"Caches: {utilised_caches}")
@@ -223,7 +263,7 @@ for endpoint in endpoints:
     for cache in connected_videos[video]:
       cache_id, latency_to_cache, request_count = cache
 
-      if latency_to_cache < lowest_latency:  # type: ignore
+      if latency_to_cache < lowest_latency:  # type: ignore  # noqa: PGH003
         lowest = latency_to_cache
         fastest_cache = cache_id
 
@@ -238,7 +278,7 @@ print(f"Optimal: {optimum_savings}")
 print(f"Efficiency: {score / optimum_savings:%}")
 
 # Output submission file
-with open(f"{source}.out", mode="w", encoding="utf8") as o:
+with Path(f"{source}.out").open(mode="w", encoding="utf8") as o:
   o.write(f"{utilised_cache_count}\n")
 
   for cache, cache_id in utilised_caches:

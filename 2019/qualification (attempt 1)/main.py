@@ -1,25 +1,33 @@
+"""
+Google Hash 2019 qualifier.
+
+Copyright 2019 Alex Blandin
+"""
+
 from itertools import chain
 from operator import itemgetter, not_
 from pathlib import Path
 from random import sample
 
 
-def div(x, y):
+def div(x, y):  # noqa: ANN001, ANN201, D103
   return 0 if y == 0 else x / y
 
 
-def main():
-  for File in Path().glob("*_*.txt"):
+def main() -> None:  # noqa: D103
+  for f in Path().glob("*_*.txt"):
     photos, cv, horizontal, indices = [], [], [], {}
-    with open(File, encoding="utf8") as o:
-      photos = [(s[1].strip().split()[0] == "H", (s[0], set(s[1].strip().split()[2:]))) for s in enumerate(o.readlines(), start=-1)][1:]
+    with f.open(encoding="utf8") as o:
+      photos = [
+        (s[1].strip().split()[0] == "H", (s[0], set(s[1].strip().split()[2:])))
+        for s in enumerate(o.readlines(), start=-1)
+      ][1:]
       (*horizontal,) = map(itemgetter(1), filter(itemgetter(0), photos))
       (*cv,) = map(itemgetter(1), filter(not_, map(itemgetter(0), photos)))
 
-    # The format
-    for index, tags in photos:  # noqa: B007
-      # index can be a tuple of two vertical indexes
-      break
+    # for index, tags in photos:
+    #   # index can be a tuple of two vertical indexes
+    #   break
 
     # Preprocessing of vertical images.
     cv.sort(key=lambda p: len(p[1]))
@@ -45,11 +53,11 @@ def main():
       similar_images = set().union(*[set(indices[tag]) for tag in tags])
       # 3. Pick this one as next slide, remove it from indices then repeat.
       slideshow.append(similar_images.pop())
-      image, image_tags, current_tag_sample  # noqa: B018
+      image, image_tags, current_tag_sample  # type:ignore[reportUnusedExpression] # noqa: B018
 
     ...
 
-    print(f"{len(indices)} tags, {len(photos)} photos in {File.name}")
+    print(f"{len(indices)} tags, {len(photos)} photos in {f.name}")
     print(f"Such as {sample(photos, 1)[0]}")
     print(f"It has {len(horizontal)} horizontal and {len(vertical)} vertical images")
     print(f"Its most unique tag is shared by {min(map(len, indices.values()))} photos")
@@ -59,7 +67,7 @@ def main():
     print(f"Its 95th% tag is shared by {ic[int(lic * 0.95)]} photos")
     print()
 
-    with open(f"{File.stem}.out", "w+", encoding="utf8") as o:
+    with Path(f"{f.stem}.out").open("w+", encoding="utf8") as o:
       for index in slideshow:
         if isinstance(index, list | tuple):
           o.write(" ".join(map(str, index)))

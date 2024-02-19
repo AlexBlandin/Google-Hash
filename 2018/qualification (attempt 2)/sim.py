@@ -1,11 +1,19 @@
+"""
+Google Hash 2018 qualifier.
+
+Copyright 2021 Alex Blandin
+"""
+
+from pathlib import Path
+
 import numpy as np
 
 ##
-# Quick simulation test to ensure it was correct (I caught a few bugs :P and also use more efficient numpy arrays if we can)
+# Quick simulation test to ensure it was correct (I caught a few bugs :P and also use more efficient numpy arrays if we can)  # noqa: E501
 ##
 
 lines = []
-with open("a_example.in", encoding="utf8") as o:
+with Path("a_example.in").open(encoding="utf8") as o:
   lines = o.readlines()
 # rows, columns, fleet size, number of rides, bonus for starting on time, time range of sim (1..T inc.)
 R, C, F, N, B, T = list(map(int, lines[0].split()))
@@ -43,13 +51,13 @@ for car in fleet:
       score += ride[6] + (B if start_time == ride[4] else 0) if 0 < time < T and time <= ride[5] else 0
 print(score)
 
-with open("a_example.out", "w", encoding="utf8") as o:
+with Path("a_example.out").open("w", encoding="utf8") as o:
   for car in fleet:
     assigned = list(map(str, filter(lambda x: x >= 0, car)))
     if len(assigned):
       o.write(f"{len(assigned)} ")
       o.write(" ".join(assigned))
-      # must be a sorted list of rides, sorted by the order THE CAR performs the ride (ie, if the car does ride X before ride Y, then X is before Y in car)
+      # must be a sorted list of rides, sorted by the order THE CAR performs the ride (ie, if the car does ride X before ride Y, then X is before Y in car)  # noqa: E501
     else:
       o.write("0")
     o.write("\n")

@@ -1,11 +1,18 @@
+"""
+Google Hash 2018 qualifier.
+
+Copyright 2020 Alex Blandin, William Webb, Harley
+"""
+
 from operator import itemgetter
+from pathlib import Path
 
 for path in ["a_example", "b_should_be_easy", "c_no_hurry", "d_metropolis", "e_high_bonus"]:
   rides = []
   rows, columns, fleet_size, ride_count, bonus, sim_length = 0, 0, 0, 0, 0, 0
 
   # Harley's function
-  def score(car, ride, bonus=bonus):
+  def score(car, ride, bonus=bonus):  # noqa: ANN001, ANN201, D103
     ride_length = abs(ride["a"] - ride["x"]) + abs(ride["b"] - ride["y"])
     start_time = abs(ride["a"] - car["last_x"]) - abs(ride["b"] - car["last_y"]) + car["next_free"]
     points = 0
@@ -13,17 +20,34 @@ for path in ["a_example", "b_should_be_easy", "c_no_hurry", "d_metropolis", "e_h
       points = ride_length + (bonus if start_time <= ride["s"] else 0)
     return points
 
-  with open(f"{path}.in", encoding="utf8") as f:
+  with Path(f"{path}.in").open(encoding="utf8") as f:
     lines = f.readlines()
     rows, columns, fleet_size, ride_count, bonus, sim_length, *_ = map(int, (lines[0]).split(" "))
 
     for i, line in enumerate(lines[1:]):
-      a, b, x, y, s, e = (int(x) for x in line.split(" "))  # start row, start columns, end row, end column, start time, end time
+      a, b, x, y, s, e = (
+        int(x) for x in line.split(" ")
+      )  # start row, start columns, end row, end column, start time, end time
       ride_length = abs(a - x) + abs(b - y)
       # assert(ride_length <= abs(e-s))
       rides.append({"i": i, "a": a, "b": b, "x": x, "y": y, "s": s, "f": e, "r": ride_length, "q": []})
 
-    print(rows, "*", columns, "area,", sim_length, "steps,", fleet_size, "cars,", ride_count, "rides,", len(rides), "viable,", bonus, "bonus")
+    print(
+      rows,
+      "*",
+      columns,
+      "area,",
+      sim_length,
+      "steps,",
+      fleet_size,
+      "cars,",
+      ride_count,
+      "rides,",
+      len(rides),
+      "viable,",
+      bonus,
+      "bonus",
+    )
 
   rides.sort(key=itemgetter("f"))
   fleet = [{"i": i, "next_free": 0, "last_x": 0, "last_y": 0, "history": []} for i in range(fleet_size)]
@@ -41,7 +65,7 @@ for path in ["a_example", "b_should_be_easy", "c_no_hurry", "d_metropolis", "e_h
       start_time = abs(ride["a"] - car["last_x"]) - abs(ride["b"] - car["last_y"]) + car["next_free"]
       car["next_free"] = ride_length + max(start_time, ride["s"])
 
-  with open(f"{path}.out", mode="w", encoding="utf8") as o:
+  with Path(f"{path}.out").open(mode="w", encoding="utf8") as o:
     for car in fleet:
       i, next_free, last_x, last_y, history = car
       o.write(f"{len(car['history'])} ")

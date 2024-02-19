@@ -1,10 +1,16 @@
+"""
+Google Hash 2022 practice.
+
+Copyright 2022 Alex Blandin
+"""
+
 from collections import defaultdict
 from pathlib import Path
 from statistics import mode
 from typing import Any
 
 
-def splat(d: dict[Any, set]):
+def splat(d: dict[Any, set]):  # noqa: ANN201
   """Take these maps of sets and splat them out as k*|v| and flatten."""
   r = []
   for k, v in d.items():
@@ -12,21 +18,21 @@ def splat(d: dict[Any, set]):
   return r
 
 
-def dictsplat(d: dict[Any, set]):
+def dictsplat(d: dict[Any, set]):  # noqa: ANN201, D103
   return {k: len(v) for k, v in d.items()}
 
 
-def lenmode(d: dict[Any, set]):
+def lenmode(d: dict[Any, set]):  # noqa: ANN201
   """The lemonade function."""
   return mode(splat(d)) if len(d) else None
 
 
-def lenmax(d: dict[Any, set]):
+def lenmax(d: dict[Any, set]):  # noqa: ANN201
   """The host with the most."""
   return max(d, key=lambda k: len(d[k]))
 
 
-def lensort(d: dict[Any, set], reverse=False) -> dict[Any, set]:
+def lensort(d: dict[Any, set], reverse=False) -> dict[Any, set]:  # noqa: ANN001, FBT002
   """Sort it by the cardinality of the internal set, smallest to largest by default."""
   return dict(sorted(d.items(), key=lambda kv: len(kv[1]), reverse=reverse))
 
@@ -52,7 +58,7 @@ for p in Path("data/").glob("*.in.txt"):
     ingredient_pool = set(liked_by) | set(disliked_by)
     liked_by, disliked_by = lensort(liked_by), lensort(disliked_by)
 
-    def score(pizza: set, client_likes=client_likes, client_dislikes=client_dislikes):
+    def score(pizza: set, client_likes=client_likes, client_dislikes=client_dislikes):  # noqa: ANN001, ANN201, D103
       score = 0
       for client, likes in client_likes.items():
         if len(likes & pizza) == len(likes) and len(client_dislikes[client] & pizza) == 0:
@@ -61,8 +67,8 @@ for p in Path("data/").glob("*.in.txt"):
 
     if True:  # that's a lot of printing
 
-      def writestats(which, d, p_name=p_name):
-        with open(f"{p_name}.{which}.txt", "w+", encoding="utf8", newline="\n") as f:
+      def writestats(which, d, p_name=p_name) -> None:  # noqa: ANN001, D103
+        with Path(f"{p_name}.{which}.txt").open("w+", encoding="utf8", newline="\n") as f:
           ds = dictsplat(d)
           ls = list(ds.values())
           f.write("occurences:\n")
@@ -87,11 +93,15 @@ for p in Path("data/").glob("*.in.txt"):
       print("ingredients that are liked and are not disliked:", len(set(liked_by) - set(disliked_by)))
       print("ingredients that are disliked and are not liked:", len(set(disliked_by) - set(liked_by)))
       print("ingredients that are liked yet also disliked:", len(set(liked_by) & set(disliked_by)))
-      print("ingredients that are neither liked nor disliked:", len(ingredient_pool) - len(set(liked_by) | set(disliked_by)))
+      print(
+        "ingredients that are neither liked nor disliked:", len(ingredient_pool) - len(set(liked_by) | set(disliked_by))
+      )
       if len(liked_by):
         print("most frequently liked:", lenmax(liked_by), "with", len(liked_by[lenmode(liked_by)]), "likes")
       if len(disliked_by):
-        print("most frequently disliked:", lenmax(disliked_by), "with", len(disliked_by[lenmode(disliked_by)]), "dislikes")
+        print(
+          "most frequently disliked:", lenmax(disliked_by), "with", len(disliked_by[lenmode(disliked_by)]), "dislikes"
+        )
       print("top", min(5, len(liked_by)), "frequently liked:", list(liked_by.keys())[-5:])
       print("top", min(5, len(disliked_by)), "frequently disliked:", list(disliked_by.keys())[-5:])
       if len(liked_by):
@@ -133,12 +143,12 @@ for p in Path("data/").glob("*.in.txt"):
 
     # output
     SCORE += score(on_the_pizza)
-    if len(on_the_pizza) < 10:
+    if len(on_the_pizza) < 10:  # noqa: PLR2004
       print(sorted(on_the_pizza), "scored:", score(on_the_pizza), "/", len(client_likes))
     else:
       print("a pizza with", len(on_the_pizza), "ingredients scored:", score(on_the_pizza), "/", len(client_likes))
     print()
-    with open(f"{p_name}.out.txt", "w+", encoding="utf8", newline="\n") as f:
+    with Path(f"{p_name}.out.txt").open("w+", encoding="utf8", newline="\n") as f:
       f.write(str(len(on_the_pizza)))
       f.write(" ")
       f.write(" ".join(on_the_pizza))

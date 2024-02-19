@@ -1,16 +1,21 @@
-from functools import partial
-from math import sqrt
-
-from tqdm import tqdm
-
 """
+Google Hash 2017 practice.
+
  ██████╗ ██╗███████╗███████╗ █████╗     ███████╗██╗     ██╗ ██████╗███████╗██████╗
  ██╔══██╗██║╚══███╔╝╚══███╔╝██╔══██╗    ██╔════╝██║     ██║██╔════╝██╔════╝██╔══██╗
  ██████╔╝██║  ███╔╝   ███╔╝ ███████║    ███████╗██║     ██║██║     █████╗  ██████╔╝
  ██╔═══╝ ██║ ███╔╝   ███╔╝  ██╔══██║    ╚════██║██║     ██║██║     ██╔══╝  ██╔══██╗
  ██║     ██║███████╗███████╗██║  ██║    ███████║███████╗██║╚██████╗███████╗██║  ██║
  ╚═╝     ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝    ╚══════╝╚══════╝╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝
+
+Copyright 2020 Alex Blandin
 """
+
+from functools import partial
+from math import sqrt
+from pathlib import Path
+
+from tqdm import tqdm
 
 # Scores 100% on example.in and small.in (fit)
 # 96.6% on medium.in (fill, 30s) or 96.9% (fit, 54m)
@@ -23,21 +28,21 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
   print()
   print(f"{path}")
   source, ext = path.split(sep=".")
-  with open(path, encoding="utf8") as p:
+  with Path(path).open(encoding="utf8") as p:
     lines = p.readlines()
     rows, columns, minimum_ingredients, maximum_area = map(int, lines[0].split())
     pizza = [[1 if c == "T" else 0 for c in line.strip()] for line in lines[1:]]
-  assert len(pizza) == rows
-  assert len(pizza[0]) == columns
+  assert len(pizza) == rows  # noqa: S101
+  assert len(pizza[0]) == columns  # noqa: S101
   total_area, minimum_area = rows * columns, minimum_ingredients * 2
   inverse = [set() for _ in range(total_area)]  # len(inverse[at(x,y)]) is how many slices cover, if 0 then uncoverable
   print(f"Rows: {rows} rows, {columns} columns, {minimum_ingredients} ingredients minimum, {maximum_area} area maximum")
 
-  def at(x, y, rows=rows):
+  def at(x, y, rows=rows):  # noqa: ANN001, ANN201
     """Linear mapping into inverse."""
     return y * rows + x
 
-  def conjoint(quad, inverse=inverse):
+  def conjoint(quad, inverse=inverse):  # noqa: ANN001, ANN201
     """All others that are conjoint to quad."""
     x1, x2, y1, y2, _ = quad
     cj = {quad}
@@ -46,29 +51,32 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
         cj |= inverse[at(x, y)]
     return cj
 
-  def quadsum(quad, pizza=pizza):
+  def quadsum(quad, pizza=pizza):  # noqa: ANN001, ANN201
     """Returns the sum of all values within a quad."""
     x1, x2, y1, y2, _ = quad
     return sum(sum(row[x1 : x2 + 1]) for row in pizza[y1 : y2 + 1])
 
-  def quadarea(quad):
+  def quadarea(quad):  # noqa: ANN001, ANN201
     """Returns only the area of a quad."""
     # _, _, _, _, area = quad
     return quad[-1]
 
-  def sufficient(quad, mi=minimum_ingredients, ma=maximum_area):
+  def sufficient(quad, mi=minimum_ingredients, ma=maximum_area):  # noqa: ANN001, ANN201
     """Finds if a quadrangle has sufficient ingredients."""
     tomatoes, area = quadsum(quad), quadarea(quad)
     mushrooms = area - tomatoes
     return tomatoes >= mi and mushrooms >= mi and area <= ma
 
-  def disjoint(quad1, quad2):
+  def disjoint(quad1, quad2):  # noqa: ANN001, ANN201, D103
     x1, x2, y1, y2, _ = quad1
     a1, a2, b1, b2, _ = quad2
     return x1 > a2 or x2 < a1 or y1 > b2 or y2 < b1  # idk, micro-opt but maybe this is faster
     # return not (x1 <= a2 and x2 >= a1 and y1 <= b2 and y2 >= b1)
 
-  def disjoint_from(quad, quads):  # TODO(alex): speedup majorly bc ~5000 in medium is real slow (and big? oh my)
+  def disjoint_from(  # noqa: ANN201, D103
+    quad,  # noqa: ANN001
+    quads,  # noqa: ANN001
+  ):  # TODO(alex): speedup majorly bc ~5000 in medium is real slow (and big? oh my)  # noqa: FIX002, RUF100
     return all(disjoint(quad, other) for other in quads)
 
   # Calculates appropriate sizes of quadrangle slices
@@ -94,13 +102,15 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
             for y in range(y1, y2 + 1):
               for x in range(x1, x2 + 1):
                 inverse[at(x, y)].add(quad)  # inverse peaks at 2.7GB on big.in
-  assert len(candidates)
-  coverable_area = sum(map(bool, map(len, inverse)))  # TODO(alex): HECKIN BUG HERE SOMETHING'S OFF WE'RE UNDERESTIMATING
+  assert len(candidates)  # noqa: S101
+  coverable_area = sum(
+    map(bool, map(len, inverse))
+  )  # TODO(alex): HECKIN BUG HERE SOMETHING'S OFF WE'RE UNDERESTIMATING  # noqa: FIX002, RUF100
   viable_area = coverable_area - quadarea(candidates[-1])  # so based on smallest slice
 
   if coverable_area != total_area:
     print(f"Only {coverable_area} of {total_area} area is coverable")
-    # empty = sorted(map(itemgetter(0), filter(lambda ix: ix[1]==0, map(lambda ix: (divmod(ix[0],rows),len(ix[1])),enumerate(inverse)))))
+    # empty = sorted(map(itemgetter(0), filter(lambda ix: ix[1]==0, map(lambda ix: (divmod(ix[0],rows),len(ix[1])),enumerate(inverse)))))  # noqa: E501
     # for y,x in empty: assert(len(inverse[at(x,y)])==0)
     # print(" ".join(map(str, empty)))
     # only big.in should have uncoverable spots, the others shouldn't (but do :BUG:)
