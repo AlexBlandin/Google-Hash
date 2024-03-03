@@ -3,6 +3,7 @@ name = "Google Hash"
 version = "1.0.0"
 description = "Repo of hash browns past"
 authors = ["AlexBlandin"]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
