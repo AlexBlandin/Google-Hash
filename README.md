@@ -2,10 +2,13 @@
 
 > Repo of hash browns past (rest in problems, hash code)
 
-```toml
-numpy = "^1.26.1"
-tqdm = "^4.66.1"
-```
+We use `numpy`, `pandas`, and `tqdm`.
+
+## Requirements
+- [`pip install -r requirements.txt`](https://www.python.org/)
+  - [regenerate with `uv pip compile pyproject.toml -o requirements.txt`](https://github.com/astral-sh/uv)
+
+# Hash Code
 
 | **Year** | **Practice**                                         | **Qualifier**                                                 | **Finals**                                                       |
 | -------- | ---------------------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------- |
