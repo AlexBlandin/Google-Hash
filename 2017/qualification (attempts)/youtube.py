@@ -101,8 +101,6 @@ for endpoint, endpoint_id in zip(endpoints, endpoint_ids, strict=False):
 # If it does, then it should
 # # want to finish this?
 
-...
-
 
 # The purpose of priority is to find all endpoints that have the same video number as input,
 # and then add together all those requests together to rate them by priority.
@@ -125,7 +123,6 @@ def priority(video_id) -> None:  # noqa: ANN001, D103
 
 # # # currently not used?
 
-...
 
 # I am doing a local priority list for each individual cache. Each cache will make an
 # array of its videos, sorted in order of the video requests for each video divided by the

@@ -55,8 +55,6 @@ def main() -> None:  # noqa: D103
       slideshow.append(similar_images.pop())
       image, image_tags, current_tag_sample  # type:ignore[reportUnusedExpression] # noqa: B018
 
-    ...
-
     print(f"{len(indices)} tags, {len(photos)} photos in {f.name}")
     print(f"Such as {sample(photos, 1)[0]}")
     print(f"It has {len(horizontal)} horizontal and {len(vertical)} vertical images")
@@ -74,7 +72,6 @@ def main() -> None:  # noqa: D103
         else:
           o.write(str(index))  # just in case it's not a tuple
         o.write("\n")
-  ...
 
 
 if __name__ == "__main__":

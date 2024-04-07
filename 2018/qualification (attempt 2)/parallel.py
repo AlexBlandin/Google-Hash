@@ -99,7 +99,6 @@ def main(queue, lines) -> None:  # noqa: ANN001, ARG001, C901, D103
         fleet, score = np.copy(old_fleet), old_score
 
       # synchronise top score
-      ...
 
       sims.set_postfix_str(f"{score} score", refresh=False)
 

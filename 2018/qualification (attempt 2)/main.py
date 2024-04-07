@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 
 def main() -> None:  # noqa: C901, D103, PLR0915
-  ...  # CyCloMaTiC CoMPleXiTy ToO HiGH
+  # CyCloMaTiC CoMPleXiTy ToO HiGH
   files = list(Path().glob("*.in"))
   print(f"Found {len(files)} input files")
   for path in files:
