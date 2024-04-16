@@ -9,32 +9,12 @@ authors = [{ name = "AlexBlandin" }]
 dependencies = ["numpy", "tqdm"]
 
 [project.optional-dependencies]
-toml = ["pytomlpp"]
-cli = ["colorama; platform_system == 'Windows'"]
-all = ["toml", "cli"]
-lint = ["ruff"]
-dev = ["all", "lint"]
+dev = ["ruff"]
 
 [project.urls]
 Documentation = "https://github.com/alexblandin/Google-Hash#readme"
 Issues = "https://github.com/alexblandin/Google-Hash/issues"
 Source = "https://github.com/alexblandin/Google-Hash"
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.envs.default]
-dependencies = ["tqdm", "numpy"]
-features = ["toml", "cli"]
-
-[tool.hatch.envs.lint]
-dependencies = ["lint"]
-detached = true
-
-# [tool.hatch.envs.dev]
-# features = ["dev"]
-# post-install-commands = ["mypy --install-types --non-interactive src/mymodule"]
 
 [tool.ruff]
 indent-width = 2
