@@ -3,7 +3,7 @@ name = "Google-Hash"
 description = "Repo of hash browns past"
 version = "1.0.0"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "MIT"
 authors = [{ name = "AlexBlandin" }]
 dependencies = ["numpy", "tqdm", "attrs", "cattrs"]
@@ -18,7 +18,7 @@ Source = "https://github.com/alexblandin/Google-Hash"
 
 [tool.ruff]
 indent-width = 2
-target-version = "py310"
+target-version = "py311"
 line-length = 120
 
 [tool.ruff.lint]
