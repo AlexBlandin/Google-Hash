@@ -31,7 +31,7 @@ class Intersection:  # noqa: D101
 
 def read(name):  # noqa: ANN001, ANN201, D103
   with Path(f"{name}.txt").open(encoding="utf8") as f:
-    lines = [line.split() for line in f.readlines()]
+    lines = [line.split() for line in f]
   _d, _n, _s, _v, _f = map(int, lines[0])
   streets = {SN: Street(int(B), int(E), int(L), 0) for B, E, SN, L in lines[1 : _s + 1]}
   paths = [streets for _, *streets in lines[_s + 1 :]]

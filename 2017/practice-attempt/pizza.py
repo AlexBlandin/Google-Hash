@@ -102,7 +102,7 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
             for y in range(y1, y2 + 1):
               for x in range(x1, x2 + 1):
                 inverse[at(x, y)].add(quad)  # inverse peaks at 2.7GB on big.in
-  assert len(candidates)  # noqa: S101
+  assert candidates  # noqa: S101
   coverable_area = sum(
     map(bool, map(len, inverse))
   )  # TODO(alex): HECKIN BUG HERE SOMETHING'S OFF WE'RE UNDERESTIMATING  # noqa: FIX002, RUF100
@@ -140,7 +140,7 @@ for path in ["example.in", "small.in", "medium.in", "big.in"][2:3]:
     for starting_slice in tqdm(candidates[:100]):
       chosen_slices, area = [starting_slice], quadarea(starting_slice)
       scand = {c for c in candidates if c not in conjoint(starting_slice)}
-      while len(scand) and area <= viable_area:
+      while scand and area <= viable_area:
         candidate = max(scand, key=quadarea)
         chosen_slices.append(candidate)
         area += quadarea(candidate)

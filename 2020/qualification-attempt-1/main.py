@@ -51,7 +51,7 @@ def main() -> None:  # noqa: C901, D103
 
     sent, sign_up, queue = set(), libraries[0], {lib.i: lib for lib in libraries}
     t, dt = 0, sign_up.T
-    while t < _d and len(queue):
+    while t < _d and queue:
       t += dt
       rem, can_send, lenbooks = _d - t, sign_up.M * (_d - t) + 1, len(sign_up.books)
       sign_up.books = sign_up.books[: min(lenbooks, can_send)]

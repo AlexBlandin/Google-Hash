@@ -114,7 +114,7 @@ def main() -> None:  # noqa: C901, D103, PLR0915
     with Path(f"{name}.out").open("w", encoding="utf8") as o:
       for car in fleet:
         assigned = list(map(str, car[car >= 0]))
-        if len(assigned):
+        if assigned:
           o.write(f"{len(assigned)} ")
           o.write(" ".join(assigned))  # sorted list of rides, order in which THE CAR performs the ride
         else:

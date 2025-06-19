@@ -54,7 +54,7 @@ print(score)  # noqa: T201
 with Path("a_example.out").open("w", encoding="utf8") as o:
   for car in fleet:
     assigned = list(map(str, filter(lambda x: x >= 0, car)))
-    if len(assigned):
+    if assigned:
       o.write(f"{len(assigned)} ")
       o.write(" ".join(assigned))
       # must be a sorted list of rides, sorted by the order THE CAR performs the ride (ie, if the car does ride X before ride Y, then X is before Y in car)  # noqa: E501
